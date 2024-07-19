@@ -1,4 +1,3 @@
-
 import click
 from backend.models import db, User
 
