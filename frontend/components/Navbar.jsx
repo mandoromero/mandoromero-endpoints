@@ -1,19 +1,48 @@
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useGlobalReducer } from '../hooks/useGlobalReducer';
+import { removeFromFavorites } from './Actions';
 
-export const Navbar = () => {
+const Navbar = () => {
+  const { state, dispatch } = useGlobalReducer();
+  const { favorites } = state;
 
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
+  return (
+    <nav className="navbar navbar-expand-lg navbar-black bg-black mb-5" style={{ fontFamily: 'SF Distant Galaxy, sans-serif'  }}>
+      <Link className="navbar-brand" to="/" style={{ marginLeft: '250px', fontSize: '50px', color: '#FFE81F' }}>
+        Star Wars Databank
+      </Link>
+      <div className="collapse navbar-collapse">
+        <div className="navbar-nav ml-auto d-flex align-items-center">
+          <button style={{ width: "150px", marginLeft: "75px", backgroundColor: "#ffe81f", borderRadius: "10%"
+           }}>
+            <Link
+              className="btn"
+              style={{ color: '#000000', fontSize: "16px" }}
+              to="/favorites"
+            >
+              Go to Favorites
+            </Link>
+          </button>
+        </div>
+      </div>
+      <ul id="favorites-list" className="list-group position-absolute" style={{ right: '10px', top: '60px', display: 'none', backgroundColor: '#343a40' }}>
+        {favorites.map((item, index) => (
+          <li key={index} className="list-group-item d-flex justify-content-between align-items-center" style={{ color: '#FFE81F', backgroundColor: '#343a40' }}>
+            {item.name}
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => dispatch(removeFromFavorites(item))}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
+                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+              </svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
 };
+
+export default Navbar;

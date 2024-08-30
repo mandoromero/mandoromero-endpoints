@@ -1,16 +1,29 @@
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import React, { useEffect } from 'react';
+import EntityList from "../components/EntityList.jsx";
+import { useGlobalReducer } from "../hooks/useGlobalReducer";
+import { fetchPeople, fetchVehicles, fetchPlanets } from '../components/Actions.jsx';
+import '../assets/css/Home.css';
 
-export const Home = () => {
 
-  const {store, dispatch} =useGlobalReducer()
+const Home = () => {
+  const { state, dispatch } = useGlobalReducer();
+  
+  useEffect(() => {
+    dispatch(fetchPeople());
+    dispatch(fetchVehicles());
+    dispatch(fetchPlanets());
+  }, [dispatch]);
 
-	return (
-		<div className="text-center mt-5">
-			<h1>Hello Rigo!!</h1>
-			<p>
-				<img src={rigoImageUrl} />
-			</p>
-		</div>
-	);
+  return (
+    <div className="container">
+      <h1>Star Wars Entities</h1>
+      <h2>Characters</h2>
+      <EntityList entities={state.characters} entityType="characters" />
+      <h2>Vehicles</h2>
+      <EntityList entities={state.vehicles} entityType="vehicles" />
+      <h2>Planets</h2>
+      <EntityList entities={state.planets} entityType="planets" />
+    </div>
+  );
+};
 }; 

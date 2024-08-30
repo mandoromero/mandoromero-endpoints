@@ -1,24 +1,79 @@
-// Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import React, { createContext, useContext, useReducer } from 'react';
+import {
+  ADD_TO_FAVORITES,
+  REMOVE_FROM_FAVORITES,
+  SET_PEOPLE,
+  SET_VEHICLES,
+  SET_PLANETS
+} from '../components/Actions';
 
-// Create a context to hold the global state of the application
-// We will call this global state the "store" to avoid confusion while using local states
-const StoreContext = createContext()
+const initialState = {
+  characters: [],
+  vehicles: [],
+  planets: [],
+  favorites: []
+};
 
-// Define a provider component that encapsulates the store and warps it in a context provider to 
-// broadcast the information throught all the app pages and components.
-export function StoreProvider({ children }) {
-    // Initialize reducer with the initial state.
-    const [store, dispatch] = useReducer(storeReducer, initialStore())
-    // Provide the store and dispatch method to all child components.
-    return <StoreContext.Provider value={{ store, dispatch }}>
-        {children}
+const storeReducer = (state, action) => {
+  switch (action.type) {
+    case ADD_TO_FAVORITES:
+      return {
+        ...state,
+        favorites: [...state.favorites, action.payload],
+      };
+    case REMOVE_FROM_FAVORITES:
+      return {
+        ...state,
+        favorites: state.favorites.filter(
+          (favorite) => favorite.uid !== action.payload.uid
+        ),
+      };
+    case SET_PEOPLE:
+      return {
+        ...state,
+        characters: action.payload,
+      };
+    case SET_VEHICLES:
+      return {
+        ...state,
+        vehicles: action.payload,
+      };
+    case SET_PLANETS:
+      return {
+        ...state,
+        planets: action.payload,
+      };
+    default:
+      throw new Error(`Unknown action: ${action.type}`);
+  }
+};
+
+const StoreContext = createContext();
+
+const asyncDispatchMiddleware = (dispatch) => (action) => {
+  if (typeof action === 'function') {
+    return action(dispatch);
+  }
+  return dispatch(action);
+};
+
+export const StoreProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(storeReducer, initialState);
+  const enhancedDispatch = asyncDispatchMiddleware(dispatch);
+
+  return (
+    <StoreContext.Provider value={{ state, dispatch: enhancedDispatch }}>
+      {children}
     </StoreContext.Provider>
-}
+  );
+};
 
-// Custom hook to access the global state and dispatch function.
-export default function useGlobalReducer() {
-    const { dispatch, store } = useContext(StoreContext)
-    return { dispatch, store };
+export const useGlobalReducer = () => {
+  const context = useContext(StoreContext);
+  if (!context) {
+    throw new Error('useGlobalReducer must be used within a StoreProvider');
+  }
+  return context;
+};
+
 }
