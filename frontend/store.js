@@ -71,4 +71,3 @@ const storeReducer = (state = initialState, action) => {
 };
 
 export default storeReducer;
-}
